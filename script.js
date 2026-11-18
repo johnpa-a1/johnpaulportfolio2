@@ -1,0 +1,26 @@
+const menuButton=document.querySelector(".menu-btn");
+const nav=document.querySelector(".nav");
+menuButton.addEventListener("click",()=>{const open=nav.classList.toggle("open");menuButton.setAttribute("aria-expanded",String(open));menuButton.setAttribute("aria-label",open?"Close navigation":"Toggle navigation");});
+nav.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{nav.classList.remove("open");menuButton.setAttribute("aria-expanded","false");}));
+const stored=JSON.parse(localStorage.getItem("portfolioAdmin")||"{}");
+const config=window.PORTFOLIO_CONFIG||{};
+const cfg={...config,...stored,profileImage:config.profileImage||stored.profileImage||""};
+const email=cfg.email||"";
+const emailLink=document.getElementById("email-link");
+emailLink.textContent=email;emailLink.href=`mailto:${email}`;
+document.getElementById("contact-btn").href=`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
+const phone=cfg.phone||"";
+const phoneLink=document.getElementById("phone-link");
+phoneLink.textContent=phone;phoneLink.href=`tel:${phone}`;
+if(cfg.linkedin)document.getElementById("linkedin-link").href=cfg.linkedin;
+if(cfg.github)document.getElementById("github-link").href=cfg.github;
+if(cfg.whatsapp)document.getElementById("whatsapp-link").href=cfg.whatsapp;
+const profileImage=document.getElementById("profile-image");
+const profileFallback=document.querySelector(".profile-fallback");
+if(cfg.profileImage){profileImage.src=cfg.profileImage;profileFallback.hidden=true;}else{profileImage.hidden=true;}
+const skillGrid=document.getElementById("skill-grid");
+const escapeHtml=(value)=>String(value).replace(/[&<>"']/g,(character)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[character]));
+const skillIcons=["</>","⌘","◎","⌘","✦","◈"];
+const defaultGroups=[{name:"Frontend",level:"Practical",detail:"HTML5, CSS3 and JavaScript"},{name:"Programming",level:"Developing",detail:"Python programming and problem-solving"},{name:"Machine Learning",level:"Introductory",detail:"Fundamentals, preprocessing, training and evaluation"},{name:"Tools",level:"Practical",detail:"Git, GitHub, VS Code and deployment platforms"}];
+const groups=stored.skills?stored.skills.map((skill)=>({name:skill,level:"Developing",detail:skill})):cfg.skillGroups||defaultGroups;
+groups.forEach((skill,index)=>{const card=document.createElement("article");card.className="skill-card";card.innerHTML=`<span class="skill-num">${String(index+1).padStart(2,"0")}</span><div class="skill-icon">${skillIcons[index%skillIcons.length]}</div><h3>${escapeHtml(skill.name)}</h3><p><strong>${escapeHtml(skill.level)}</strong><br>${escapeHtml(skill.detail)}</p><div class="chips">${escapeHtml(skill.detail).split(",").map((item)=>`<span>${item.trim()}</span>`).join("")}</div>`;skillGrid.appendChild(card);});
